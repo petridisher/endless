@@ -113,12 +113,15 @@ const canvas = document.getElementById("gameCanvas");
 
 function loopDifficulty() {
   setInterval(function() {
-    // code here the thing for making it harder till idk you got it (done)
-obstacleSpeed += 0.5;
-obstacleFrequency -= 0.5;
+    // code here the thing that makes it harder
+obstacleSpeed += 1;
+obstacleFrequency -= 1;
 powerUpFrequency += 10;
   }, 30000); // 30 seconds in milliseconds
 }
+        // increases the difficulty after each 30s
+        loopDifficulty();
+
     function init() {
         setVariablesForMode(modeSelector.value);
         canvas.width = window.innerWidth;
@@ -130,8 +133,6 @@ powerUpFrequency += 10;
         obstacles = [];
         powerUps = [];
         setInterval(gameLoop, 1000 / 60);
-        // increases the difficulty after each 30s
-        loopDifficulty();
     }
 
     function startGame() {
