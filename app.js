@@ -4,6 +4,9 @@ const canvas = document.getElementById("gameCanvas");
     const modeSelector = document.getElementById("modeSelector");
     const graphicsQuality = document.getElementById("graphicsQuality");
 
+    let clouds = [];
+    let cloudSpeed = 20;
+
     let playerSize, obstacleSize, powerUpSize;
     let obstacleSpeed = 20;
     let obstacleFrequency = 20;
@@ -17,6 +20,8 @@ const canvas = document.getElementById("gameCanvas");
     let invincibleCounter = 0;
     let gameInterval;
 
+    const cloudImg = new Image();
+    cloudImg.src = 'cloud.png';
     const playerImg = new Image();
     playerImg.src = 'player.png';
     const playerImg1 = new Image();
@@ -40,6 +45,50 @@ const canvas = document.getElementById("gameCanvas");
 
     function lerp(a, b, t) {
         return a + (b - a) * t;
+    }
+
+    function initClouds() {
+        clouds = [];
+        const cloudCount = getCloudCount();
+        for (let i = 0; i < cloudCount; i++) {
+            const cloudX = Math.random() * canvas.width;
+            const cloudY = Math.random() * canvas.height;
+            clouds.push({ x: cloudX, y: cloudY });
+        }
+    }
+
+    function getCloudCount() {
+        switch (graphicsQuality.value) {
+            case 'low':
+                return 0;
+            case 'medium':
+                return 1;
+            case 'high':
+                return 3;
+            default:
+                return 0;
+        }
+    }
+
+    function updateClouds() {
+        for (let i = 0; i < clouds.length; i++) {
+            clouds[i].y += cloudSpeed;
+            if (clouds[i].y > canvas.height) {
+                clouds[i].y = -100; // Reset the cloud position
+            }
+        }
+    }
+
+    const cloudSprite = {
+        width: 1,
+        height: 1
+    };
+
+    function drawClouds() {
+        for (let i = 0; i < clouds.length; i++) {
+            // Draw the cloud image at the cloud's position
+            ctx.drawImage(cloudImg, clouds[i].x - cloudSprite.width / 2, clouds[i].y - cloudSprite.height / 2);
+        }
     }
 
     function setVariablesForMode(mode) {
@@ -68,7 +117,7 @@ function loopDifficulty() {
 obstacleSpeed += 1;
 obstacleFrequency -= 1;
 powerUpFrequency += 10;
-  }, 15000); // 15 seconds in milliseconds
+  }, 30000); // 30 seconds in milliseconds
 }
         // increases the difficulty after each 30s
         loopDifficulty();
@@ -99,6 +148,7 @@ powerUpFrequency += 10;
             canvas.addEventListener("mousemove", handleMouseMove);
         }
         init();
+        initClouds(); // Initialize clouds
     }
 
     function handleMouseDown(event) {
@@ -138,6 +188,7 @@ powerUpFrequency += 10;
 
     function update() {
         if (!isGamePaused) {
+            updateClouds();
             score++;
             if (score % obstacleFrequency === 0) {
                 const obstacleX = Math.random() * (canvas.width - obstacleSize);
@@ -207,6 +258,7 @@ powerUpFrequency += 10;
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawClouds();
 
         //draw player sprite
         ctx.imageSmoothingEnabled = false;
